@@ -47,6 +47,11 @@ const INITIAL_FORM: FormState = {
   hireDate: "",
 };
 
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "管理者",
+  EMPLOYEE: "一般",
+};
+
 export function EmployeeFormDialog({
   open,
   onOpenChange,
@@ -149,7 +154,9 @@ export function EmployeeFormDialog({
             onValueChange={(value) => setForm({ ...form, departmentId: value ?? "" })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="部署を選択" />
+              <SelectValue placeholder="部署を選択">
+                {departments.find((d) => d.id === form.departmentId)?.name ?? "部署を選択"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {departments.map((dept) => (
@@ -173,7 +180,9 @@ export function EmployeeFormDialog({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="ロールを選択" />
+              <SelectValue placeholder="ロールを選択">
+                {ROLE_LABELS[form.role] ?? "ロールを選択"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="EMPLOYEE">一般</SelectItem>
