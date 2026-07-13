@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ClockMemoDialog } from "./ClockMemoDialog";
@@ -14,12 +14,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       expect(screen.getByText("電車遅延")).toBeInTheDocument();
@@ -35,12 +30,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       await user.click(screen.getByText("電車遅延"));
@@ -55,12 +45,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       await user.click(screen.getByText("その他"));
@@ -76,12 +61,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       await user.click(screen.getByText("電車遅延"));
@@ -96,12 +76,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       await user.click(screen.getByRole("button", { name: /出勤する/ }));
@@ -115,12 +90,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       await user.click(screen.getByText("その他"));
@@ -137,12 +107,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockIn"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockIn" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       await user.click(screen.getByText("その他"));
@@ -157,12 +122,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockOut"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockOut" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       expect(screen.getByText("体調不良")).toBeInTheDocument();
@@ -178,12 +138,7 @@ describe("ClockMemoDialog", () => {
       const onCancel = vi.fn();
 
       render(
-        <ClockMemoDialog
-          open={true}
-          type="clockOut"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <ClockMemoDialog open={true} type="clockOut" onConfirm={onConfirm} onCancel={onCancel} />,
       );
 
       expect(screen.getByRole("button", { name: /退勤する/ })).toBeInTheDocument();

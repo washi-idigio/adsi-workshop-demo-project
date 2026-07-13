@@ -20,7 +20,7 @@ describe("MemoDetailDialog", () => {
         onClose={vi.fn()}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />
+      />,
     );
 
     expect(screen.getByText(longMemo)).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("MemoDetailDialog", () => {
         onClose={vi.fn()}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />
+      />,
     );
 
     expect(screen.getByRole("button", { name: /編集/ })).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe("MemoDetailDialog", () => {
         onClose={vi.fn()}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />
+      />,
     );
 
     expect(screen.getByRole("button", { name: /削除/ })).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe("MemoDetailDialog", () => {
         onClose={vi.fn()}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />
+      />,
     );
 
     expect(screen.queryByRole("button", { name: /編集/ })).not.toBeInTheDocument();
@@ -88,7 +88,7 @@ describe("MemoDetailDialog", () => {
         onClose={vi.fn()}
         onEdit={onEdit}
         onDelete={vi.fn()}
-      />
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: /編集/ }));
@@ -108,7 +108,7 @@ describe("MemoDetailDialog", () => {
         onClose={vi.fn()}
         onEdit={vi.fn()}
         onDelete={onDelete}
-      />
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: /削除/ }));

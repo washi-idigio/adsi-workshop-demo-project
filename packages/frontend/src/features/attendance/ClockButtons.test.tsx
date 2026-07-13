@@ -14,6 +14,7 @@ vi.mock("./ClockMemoDialog", () => ({
 }));
 
 import { useTodayStatus } from "./useAttendance";
+
 const mockUseTodayStatus = vi.mocked(useTodayStatus);
 
 describe("ClockButtons", () => {
@@ -40,7 +41,15 @@ describe("ClockButtons", () => {
     mockUseTodayStatus.mockReturnValue({
       data: {
         status: "CLOCKED_IN",
-        records: [{ id: "1", workDate: "2026-07-13", clockIn: "09:00:00", clockOut: null, corrected: false }],
+        records: [
+          {
+            id: "1",
+            workDate: "2026-07-13",
+            clockIn: "09:00:00",
+            clockOut: null,
+            corrected: false,
+          },
+        ],
       },
       isLoading: false,
     } as ReturnType<typeof useTodayStatus>);
@@ -58,7 +67,15 @@ describe("ClockButtons", () => {
     mockUseTodayStatus.mockReturnValue({
       data: {
         status: "CLOCKED_OUT",
-        records: [{ id: "1", workDate: "2026-07-13", clockIn: "09:00:00", clockOut: "18:00:00", corrected: false }],
+        records: [
+          {
+            id: "1",
+            workDate: "2026-07-13",
+            clockIn: "09:00:00",
+            clockOut: "18:00:00",
+            corrected: false,
+          },
+        ],
       },
       isLoading: false,
     } as ReturnType<typeof useTodayStatus>);
@@ -109,7 +126,15 @@ describe("ClockButtons", () => {
       mockUseTodayStatus.mockReturnValue({
         data: {
           status: "CLOCKED_IN" as const,
-          records: [{ id: "1", workDate: "2026-07-13", clockIn: "09:00:00", clockOut: null, corrected: false }],
+          records: [
+            {
+              id: "1",
+              workDate: "2026-07-13",
+              clockIn: "09:00:00",
+              clockOut: null,
+              corrected: false,
+            },
+          ],
         },
         isLoading: false,
       } as unknown as ReturnType<typeof useTodayStatus>);
@@ -125,7 +150,15 @@ describe("ClockButtons", () => {
       mockUseTodayStatus.mockReturnValue({
         data: {
           status: "CLOCKED_IN" as const,
-          records: [{ id: "1", workDate: "2026-07-13", clockIn: "09:00:00", clockOut: null, corrected: false }],
+          records: [
+            {
+              id: "1",
+              workDate: "2026-07-13",
+              clockIn: "09:00:00",
+              clockOut: null,
+              corrected: false,
+            },
+          ],
         },
         isLoading: false,
       } as unknown as ReturnType<typeof useTodayStatus>);

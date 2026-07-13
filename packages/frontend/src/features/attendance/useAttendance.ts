@@ -32,9 +32,10 @@ export function useTodayStatus() {
 export function useClockIn() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const employeeId = user?.id;
 
   return useMutation({
-    mutationFn: (memo?: string) => clockIn(user!.id, memo),
+    mutationFn: (memo?: string) => clockIn(employeeId!, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
       toast.success("出勤を記録しました");
@@ -45,9 +46,10 @@ export function useClockIn() {
 export function useClockOut() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const employeeId = user?.id;
 
   return useMutation({
-    mutationFn: (memo?: string) => clockOut(user!.id, memo),
+    mutationFn: (memo?: string) => clockOut(employeeId!, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
       toast.success("退勤を記録しました");
@@ -87,10 +89,18 @@ export function useTeamAttendance(month: string) {
 export function useUpdateMemo() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const employeeId = user?.id;
 
   return useMutation({
-    mutationFn: ({ recordId, type, memo }: { recordId: string; type: "clockIn" | "clockOut"; memo: string }) =>
-      updateMemo(recordId, user!.id, type, memo),
+    mutationFn: ({
+      recordId,
+      type,
+      memo,
+    }: {
+      recordId: string;
+      type: "clockIn" | "clockOut";
+      memo: string;
+    }) => updateMemo(recordId, employeeId!, type, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: HISTORY_KEY });
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
@@ -102,10 +112,11 @@ export function useUpdateMemo() {
 export function useDeleteMemo() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const employeeId = user?.id;
 
   return useMutation({
     mutationFn: ({ recordId, type }: { recordId: string; type: "clockIn" | "clockOut" }) =>
-      deleteMemo(recordId, user!.id, type),
+      deleteMemo(recordId, employeeId!, type),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: HISTORY_KEY });
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });

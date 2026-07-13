@@ -77,14 +77,17 @@ export function ClockButtons() {
     clockOutMutation.mutate(undefined);
   }, [clockOutMutation, clockOutLongPress]);
 
-  const handleMemoConfirm = useCallback((memo: string | null) => {
-    setMemoDialogOpen(false);
-    if (memoDialogType === "clockIn") {
-      clockInMutation.mutate(memo ?? undefined);
-    } else {
-      clockOutMutation.mutate(memo ?? undefined);
-    }
-  }, [memoDialogType, clockInMutation, clockOutMutation]);
+  const handleMemoConfirm = useCallback(
+    (memo: string | null) => {
+      setMemoDialogOpen(false);
+      if (memoDialogType === "clockIn") {
+        clockInMutation.mutate(memo ?? undefined);
+      } else {
+        clockOutMutation.mutate(memo ?? undefined);
+      }
+    },
+    [memoDialogType, clockInMutation, clockOutMutation],
+  );
 
   const handleMemoCancel = useCallback(() => {
     setMemoDialogOpen(false);

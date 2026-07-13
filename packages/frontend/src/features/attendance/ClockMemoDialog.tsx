@@ -15,7 +15,14 @@ interface ClockMemoDialogProps {
   onCancel: () => void;
 }
 
-export function ClockMemoDialog({ open, type, initialMemo, confirmLabel: customLabel, onConfirm, onCancel }: ClockMemoDialogProps) {
+export function ClockMemoDialog({
+  open,
+  type,
+  initialMemo,
+  confirmLabel: customLabel,
+  onConfirm,
+  onCancel,
+}: ClockMemoDialogProps) {
   const [memo, setMemo] = useState(initialMemo ?? "");
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -78,7 +85,11 @@ export function ClockMemoDialog({ open, type, initialMemo, confirmLabel: customL
         <button type="button" onClick={onCancel} className="px-4 py-2 text-sm rounded border">
           キャンセル
         </button>
-        <button type="button" onClick={handleConfirm} className="px-4 py-2 text-sm rounded bg-blue-500 text-white">
+        <button
+          type="button"
+          onClick={handleConfirm}
+          className="px-4 py-2 text-sm rounded bg-blue-500 text-white"
+        >
           {confirmLabel}
         </button>
       </div>

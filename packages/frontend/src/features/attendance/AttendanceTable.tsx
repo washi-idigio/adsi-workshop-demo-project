@@ -4,9 +4,9 @@ import { useState } from "react";
 import { type Column, DataTable } from "@/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import type { AttendanceRecordResponse, DailyAttendanceResponse } from "./attendance-api";
+import { ClockMemoDialog } from "./ClockMemoDialog";
 import { formatDate, formatMinutes, formatTime } from "./format";
 import { MemoDetailDialog } from "./MemoDetailDialog";
-import { ClockMemoDialog } from "./ClockMemoDialog";
 import { useDeleteMemo, useUpdateMemo } from "./useAttendance";
 
 function firstClockIn(day: DailyAttendanceResponse): string {
@@ -84,9 +84,21 @@ export function AttendanceTable({ days, isOwner = true }: AttendanceTableProps) 
     { key: "date", header: "日付", render: (day) => formatDate(day.date) },
     { key: "clockIn", header: "出勤", render: (day) => firstClockIn(day) },
     { key: "clockOut", header: "退勤", render: (day) => lastClockOut(day) },
-    { key: "workMinutes", header: "勤務時間", render: (day) => (day.workMinutes > 0 ? formatMinutes(day.workMinutes) : "-") },
-    { key: "breakMinutes", header: "休憩", render: (day) => (day.breakMinutes > 0 ? formatMinutes(day.breakMinutes) : "-") },
-    { key: "overtimeMinutes", header: "残業", render: (day) => (day.overtimeMinutes > 0 ? formatMinutes(day.overtimeMinutes) : "-") },
+    {
+      key: "workMinutes",
+      header: "勤務時間",
+      render: (day) => (day.workMinutes > 0 ? formatMinutes(day.workMinutes) : "-"),
+    },
+    {
+      key: "breakMinutes",
+      header: "休憩",
+      render: (day) => (day.breakMinutes > 0 ? formatMinutes(day.breakMinutes) : "-"),
+    },
+    {
+      key: "overtimeMinutes",
+      header: "残業",
+      render: (day) => (day.overtimeMinutes > 0 ? formatMinutes(day.overtimeMinutes) : "-"),
+    },
     {
       key: "memo",
       header: "メモ",
@@ -103,11 +115,17 @@ export function AttendanceTable({ days, isOwner = true }: AttendanceTableProps) 
         ) : null;
       },
     },
-    { key: "corrected", header: "", render: (day) => (hasCorrected(day) ? <Badge variant="outline">修正</Badge> : null) },
+    {
+      key: "corrected",
+      header: "",
+      render: (day) => (hasCorrected(day) ? <Badge variant="outline">修正</Badge> : null),
+    },
   ];
 
   const selectedMemo = selectedRecord
-    ? (selectedMemoType === "clockIn" ? selectedRecord.clockInMemo : selectedRecord.clockOutMemo)
+    ? selectedMemoType === "clockIn"
+      ? selectedRecord.clockInMemo
+      : selectedRecord.clockOutMemo
     : null;
 
   return (

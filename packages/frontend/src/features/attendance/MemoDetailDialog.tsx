@@ -12,7 +12,15 @@ interface MemoDetailDialogProps {
   onDelete: () => void;
 }
 
-export function MemoDetailDialog({ open, memo, type, isOwner, onClose, onEdit, onDelete }: MemoDetailDialogProps) {
+export function MemoDetailDialog({
+  open,
+  memo,
+  type,
+  isOwner,
+  onClose,
+  onEdit,
+  onDelete,
+}: MemoDetailDialogProps) {
   if (!open) return null;
 
   return (
@@ -22,10 +30,18 @@ export function MemoDetailDialog({ open, memo, type, isOwner, onClose, onEdit, o
       <div className="flex justify-end gap-2">
         {isOwner && (
           <>
-            <button type="button" onClick={onDelete} className="px-4 py-2 text-sm rounded border text-red-600">
+            <button
+              type="button"
+              onClick={onDelete}
+              className="px-4 py-2 text-sm rounded border text-red-600"
+            >
               削除
             </button>
-            <button type="button" onClick={onEdit} className="px-4 py-2 text-sm rounded bg-blue-500 text-white">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="px-4 py-2 text-sm rounded bg-blue-500 text-white"
+            >
               編集
             </button>
           </>

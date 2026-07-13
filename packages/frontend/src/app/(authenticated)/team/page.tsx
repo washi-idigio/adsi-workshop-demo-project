@@ -4,10 +4,10 @@ import { useState } from "react";
 import { type Column, DataTable } from "@/components/DataTable";
 import { MonthSelector } from "@/components/MonthSelector";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { TeamMemberSummaryResponse } from "@/features/attendance/attendance-api";
 import { AttendanceTable } from "@/features/attendance/AttendanceTable";
+import type { TeamMemberSummaryResponse } from "@/features/attendance/attendance-api";
 import { formatMinutes } from "@/features/attendance/format";
-import { useTeamAttendance, useAttendanceHistoryFor } from "@/features/attendance/useAttendance";
+import { useAttendanceHistoryFor, useTeamAttendance } from "@/features/attendance/useAttendance";
 import { useAuth } from "@/features/auth/useAuth";
 
 function currentYearMonth(): { year: number; month: number } {
@@ -51,7 +51,9 @@ export default function TeamPage() {
       render: (m) => (
         <button
           type="button"
-          onClick={() => setExpandedEmployee(expandedEmployee === m.employeeId ? null : m.employeeId)}
+          onClick={() =>
+            setExpandedEmployee(expandedEmployee === m.employeeId ? null : m.employeeId)
+          }
           className="text-blue-600 underline hover:text-blue-800"
         >
           {m.employeeName}
@@ -59,8 +61,16 @@ export default function TeamPage() {
       ),
     },
     { key: "workDays", header: "出勤日数", render: (m) => `${m.workDays}日` },
-    { key: "totalWorkMinutes", header: "総勤務時間", render: (m) => formatMinutes(m.totalWorkMinutes) },
-    { key: "totalOvertimeMinutes", header: "総残業時間", render: (m) => formatMinutes(m.totalOvertimeMinutes) },
+    {
+      key: "totalWorkMinutes",
+      header: "総勤務時間",
+      render: (m) => formatMinutes(m.totalWorkMinutes),
+    },
+    {
+      key: "totalOvertimeMinutes",
+      header: "総残業時間",
+      render: (m) => formatMinutes(m.totalOvertimeMinutes),
+    },
     { key: "absentDays", header: "欠勤日数", render: (m) => `${m.absentDays}日` },
   ];
 
