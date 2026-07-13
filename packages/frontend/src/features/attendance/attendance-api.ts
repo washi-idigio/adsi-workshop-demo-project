@@ -6,6 +6,8 @@ export interface AttendanceRecordResponse {
   clockIn: string;
   clockOut: string | null;
   corrected: boolean;
+  clockInMemo: string | null;
+  clockOutMemo: string | null;
 }
 
 export interface TodayStatusResponse {
@@ -44,15 +46,17 @@ export interface TeamMemberSummaryResponse {
   absentDays: number;
 }
 
-export function clockIn(employeeId: string): Promise<AttendanceRecordResponse> {
+export function clockIn(employeeId: string, memo?: string): Promise<AttendanceRecordResponse> {
   return apiClient.post<AttendanceRecordResponse>(
     `/api/attendance/clock-in?employeeId=${employeeId}`,
+    memo != null ? { memo } : undefined,
   );
 }
 
-export function clockOut(employeeId: string): Promise<AttendanceRecordResponse> {
+export function clockOut(employeeId: string, memo?: string): Promise<AttendanceRecordResponse> {
   return apiClient.post<AttendanceRecordResponse>(
     `/api/attendance/clock-out?employeeId=${employeeId}`,
+    memo != null ? { memo } : undefined,
   );
 }
 
@@ -75,6 +79,28 @@ export function fetchTeamAttendance(
 ): Promise<TeamMemberSummaryResponse[]> {
   return apiClient.get<TeamMemberSummaryResponse[]>(
     `/api/attendance/team?managerId=${managerId}&month=${month}`,
+  );
+}
+
+export function updateMemo(
+  recordId: string,
+  employeeId: string,
+  type: "clockIn" | "clockOut",
+  memo: string,
+): Promise<AttendanceRecordResponse> {
+  return apiClient.put<AttendanceRecordResponse>(
+    `/api/attendance/${recordId}/memo?employeeId=${employeeId}`,
+    { type, memo },
+  );
+}
+
+export function deleteMemo(
+  recordId: string,
+  employeeId: string,
+  type: "clockIn" | "clockOut",
+): Promise<void> {
+  return apiClient.delete<void>(
+    `/api/attendance/${recordId}/memo/${type}?employeeId=${employeeId}`,
   );
 }
 

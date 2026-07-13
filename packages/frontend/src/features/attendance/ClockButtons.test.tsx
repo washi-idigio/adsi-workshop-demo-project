@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ClockButtons } from "./ClockButtons";
 
@@ -6,6 +7,10 @@ vi.mock("./useAttendance", () => ({
   useTodayStatus: vi.fn(),
   useClockIn: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
   useClockOut: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+}));
+
+vi.mock("./ClockMemoDialog", () => ({
+  ClockMemoDialog: () => null,
 }));
 
 import { useTodayStatus } from "./useAttendance";
@@ -65,5 +70,76 @@ describe("ClockButtons", () => {
 
     expect(clockInButton).toBeDisabled();
     expect(clockOutButton).toBeDisabled();
+  });
+
+  describe("メモダイアログ連携", () => {
+    it("出勤ボタン通常クリックではダイアログが表示されず即打刻される", async () => {
+      const user = userEvent.setup();
+      mockUseTodayStatus.mockReturnValue({
+        data: { status: "NOT_CLOCKED_IN" as const, records: [] },
+        isLoading: false,
+      } as unknown as ReturnType<typeof useTodayStatus>);
+
+      render(<ClockButtons />);
+
+      await user.click(screen.getByRole("button", { name: /出勤/ }));
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("出勤ボタン長押しでメモダイアログが表示される", async () => {
+      mockUseTodayStatus.mockReturnValue({
+        data: { status: "NOT_CLOCKED_IN" as const, records: [] },
+        isLoading: false,
+      } as unknown as ReturnType<typeof useTodayStatus>);
+
+      render(<ClockButtons />);
+
+      const clockInButton = screen.getByRole("button", { name: /出勤/ });
+
+      clockInButton.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      clockInButton.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("退勤ボタン通常クリックではダイアログが表示されず即打刻される", async () => {
+      const user = userEvent.setup();
+      mockUseTodayStatus.mockReturnValue({
+        data: {
+          status: "CLOCKED_IN" as const,
+          records: [{ id: "1", workDate: "2026-07-13", clockIn: "09:00:00", clockOut: null, corrected: false }],
+        },
+        isLoading: false,
+      } as unknown as ReturnType<typeof useTodayStatus>);
+
+      render(<ClockButtons />);
+
+      await user.click(screen.getByRole("button", { name: /退勤/ }));
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("退勤ボタン長押しでメモダイアログが表示される", async () => {
+      mockUseTodayStatus.mockReturnValue({
+        data: {
+          status: "CLOCKED_IN" as const,
+          records: [{ id: "1", workDate: "2026-07-13", clockIn: "09:00:00", clockOut: null, corrected: false }],
+        },
+        isLoading: false,
+      } as unknown as ReturnType<typeof useTodayStatus>);
+
+      render(<ClockButtons />);
+
+      const clockOutButton = screen.getByRole("button", { name: /退勤/ });
+
+      // Simulate long press (pointerdown → wait → pointerup)
+      clockOutButton.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      clockOutButton.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
   });
 });

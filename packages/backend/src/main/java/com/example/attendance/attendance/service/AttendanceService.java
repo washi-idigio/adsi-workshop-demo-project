@@ -12,7 +12,11 @@ public interface AttendanceService {
 
     AttendanceRecordResponse clockIn(UUID employeeId);
 
+    AttendanceRecordResponse clockIn(UUID employeeId, String memo);
+
     AttendanceRecordResponse clockOut(UUID employeeId);
+
+    AttendanceRecordResponse clockOut(UUID employeeId, String memo);
 
     TodayStatusResponse getTodayStatus(UUID employeeId);
 
@@ -21,4 +25,8 @@ public interface AttendanceService {
     List<TeamMemberSummaryResponse> getTeamAttendance(UUID managerId, String month);
 
     List<TeamMemberSummaryResponse> getAllAttendance(String month, UUID departmentId);
+
+    AttendanceRecordResponse updateMemo(UUID recordId, UUID employeeId, String type, String memo);
+
+    void deleteMemo(UUID recordId, UUID employeeId, String type);
 }
