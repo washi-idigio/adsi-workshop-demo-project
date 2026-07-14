@@ -1,10 +1,12 @@
 "use client";
 
 import { LogIn, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ClockMemoDialog } from "./ClockMemoDialog";
 import { formatTime } from "./format";
 import { useClockIn, useClockOut, useTodayStatus } from "./useAttendance";
+import { useLongPress } from "./useLongPress";
 
 function CurrentTime() {
   const [now, setNow] = useState(() => new Date());
@@ -49,6 +51,48 @@ export function ClockButtons() {
   const clockInMutation = useClockIn();
   const clockOutMutation = useClockOut();
 
+  const [memoDialogOpen, setMemoDialogOpen] = useState(false);
+  const [memoDialogType, setMemoDialogType] = useState<"clockIn" | "clockOut">("clockIn");
+
+  const openMemoDialog = useCallback((type: "clockIn" | "clockOut") => {
+    setMemoDialogType(type);
+    setMemoDialogOpen(true);
+  }, []);
+
+  const clockInLongPress = useLongPress({
+    onLongPress: () => openMemoDialog("clockIn"),
+  });
+
+  const clockOutLongPress = useLongPress({
+    onLongPress: () => openMemoDialog("clockOut"),
+  });
+
+  const handleClockInClick = useCallback(() => {
+    if (clockInLongPress.wasLongPress()) return;
+    clockInMutation.mutate(undefined);
+  }, [clockInMutation, clockInLongPress]);
+
+  const handleClockOutClick = useCallback(() => {
+    if (clockOutLongPress.wasLongPress()) return;
+    clockOutMutation.mutate(undefined);
+  }, [clockOutMutation, clockOutLongPress]);
+
+  const handleMemoConfirm = useCallback(
+    (memo: string | null) => {
+      setMemoDialogOpen(false);
+      if (memoDialogType === "clockIn") {
+        clockInMutation.mutate(memo ?? undefined);
+      } else {
+        clockOutMutation.mutate(memo ?? undefined);
+      }
+    },
+    [memoDialogType, clockInMutation, clockOutMutation],
+  );
+
+  const handleMemoCancel = useCallback(() => {
+    setMemoDialogOpen(false);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="rounded-lg border p-6 space-y-4">
@@ -63,7 +107,7 @@ export function ClockButtons() {
   }
 
   const status = todayStatus?.status ?? "NOT_CLOCKED_IN";
-  const canClockIn = status === "NOT_CLOCKED_IN" || status !== "CLOCKED_OUT";
+  const canClockIn = status === "NOT_CLOCKED_IN";
   const canClockOut = status === "CLOCKED_IN";
   const isPending = clockInMutation.isPending || clockOutMutation.isPending;
 
@@ -84,8 +128,10 @@ export function ClockButtons() {
         <button
           type="button"
           disabled={!canClockIn || isPending}
-          onClick={() => clockInMutation.mutate()}
-          className="flex flex-col items-center justify-center gap-2 rounded-xl bg-blue-500 py-8 text-white transition-colors hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400"
+          onClick={handleClockInClick}
+          onPointerDown={clockInLongPress.onPointerDown}
+          onPointerUp={clockInLongPress.onPointerUp}
+          className="flex flex-col items-center justify-center gap-2 rounded-xl bg-green-500 py-8 text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:bg-gray-200 disabled:text-gray-400"
         >
           <LogIn className="h-8 w-8" />
           <span className="text-lg font-bold">出勤</span>
@@ -93,13 +139,28 @@ export function ClockButtons() {
         <button
           type="button"
           disabled={!canClockOut || isPending}
-          onClick={() => clockOutMutation.mutate()}
+          onClick={handleClockOutClick}
+          onPointerDown={clockOutLongPress.onPointerDown}
+          onPointerUp={clockOutLongPress.onPointerUp}
           className="flex flex-col items-center justify-center gap-2 rounded-xl bg-orange-500 py-8 text-white transition-colors hover:bg-orange-600 active:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400"
         >
           <LogOut className="h-8 w-8" />
           <span className="text-lg font-bold">退勤</span>
         </button>
       </div>
+      <p className="text-xs text-center text-muted-foreground">
+        勤怠理由を入力する場合は長押ししてください
+      </p>
+      {memoDialogOpen && (
+        <div role="dialog" aria-modal="true">
+          <ClockMemoDialog
+            open={memoDialogOpen}
+            type={memoDialogType}
+            onConfirm={handleMemoConfirm}
+            onCancel={handleMemoCancel}
+          />
+        </div>
+      )}
     </div>
   );
 }

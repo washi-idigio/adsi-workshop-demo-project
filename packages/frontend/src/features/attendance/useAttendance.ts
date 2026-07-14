@@ -6,9 +6,11 @@ import { useAuth } from "@/features/auth/useAuth";
 import {
   clockIn,
   clockOut,
+  deleteMemo,
   fetchHistory,
   fetchTeamAttendance,
   fetchTodayStatus,
+  updateMemo,
 } from "./attendance-api";
 
 const TODAY_STATUS_KEY = ["attendance", "today"] as const;
@@ -30,9 +32,10 @@ export function useTodayStatus() {
 export function useClockIn() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const employeeId = user?.id;
 
   return useMutation({
-    mutationFn: () => clockIn(user!.id),
+    mutationFn: (memo?: string) => clockIn(employeeId!, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
       toast.success("出勤を記録しました");
@@ -43,9 +46,10 @@ export function useClockIn() {
 export function useClockOut() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const employeeId = user?.id;
 
   return useMutation({
-    mutationFn: () => clockOut(user!.id),
+    mutationFn: (memo?: string) => clockOut(employeeId!, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
       toast.success("退勤を記録しました");
@@ -64,6 +68,14 @@ export function useAttendanceHistory(month: string) {
   });
 }
 
+export function useAttendanceHistoryFor(employeeId: string | null, month: string) {
+  return useQuery({
+    queryKey: [...HISTORY_KEY, employeeId, month],
+    queryFn: () => fetchHistory(employeeId!, month),
+    enabled: !!employeeId && !!month,
+  });
+}
+
 export function useTeamAttendance(month: string) {
   const { user } = useAuth();
 
@@ -71,5 +83,44 @@ export function useTeamAttendance(month: string) {
     queryKey: [...TEAM_KEY, user?.id, month],
     queryFn: () => fetchTeamAttendance(user!.id, month),
     enabled: !!user?.isManager && !!month,
+  });
+}
+
+export function useUpdateMemo() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const employeeId = user?.id;
+
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      type,
+      memo,
+    }: {
+      recordId: string;
+      type: "clockIn" | "clockOut";
+      memo: string;
+    }) => updateMemo(recordId, employeeId!, type, memo),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: HISTORY_KEY });
+      queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
+      toast.success("メモを更新しました");
+    },
+  });
+}
+
+export function useDeleteMemo() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const employeeId = user?.id;
+
+  return useMutation({
+    mutationFn: ({ recordId, type }: { recordId: string; type: "clockIn" | "clockOut" }) =>
+      deleteMemo(recordId, employeeId!, type),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: HISTORY_KEY });
+      queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
+      toast.success("メモを削除しました");
+    },
   });
 }

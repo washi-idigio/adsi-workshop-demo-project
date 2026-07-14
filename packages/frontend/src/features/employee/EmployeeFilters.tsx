@@ -10,6 +10,11 @@ import {
 } from "@/components/ui/select";
 import type { DepartmentSummary } from "./employee-api";
 
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "管理者",
+  EMPLOYEE: "一般",
+};
+
 interface EmployeeFiltersProps {
   departmentId: string;
   onDepartmentIdChange: (value: string) => void;
@@ -36,7 +41,9 @@ export function EmployeeFilters({
         onValueChange={(value) => onDepartmentIdChange(value ?? "")}
       >
         <SelectTrigger>
-          <SelectValue placeholder="部署で絞り込み" />
+          <SelectValue placeholder="部署で絞り込み">
+            {departments.find((d) => d.id === departmentId)?.name ?? "部署で絞り込み"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {departments.map((dept) => (
@@ -49,7 +56,9 @@ export function EmployeeFilters({
 
       <Select value={role || null} onValueChange={(value) => onRoleChange(value ?? "")}>
         <SelectTrigger>
-          <SelectValue placeholder="ロールで絞り込み" />
+          <SelectValue placeholder="ロールで絞り込み">
+            {ROLE_LABELS[role] ?? "ロールで絞り込み"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="ADMIN">管理者</SelectItem>

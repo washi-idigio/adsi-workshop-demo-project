@@ -4,9 +4,10 @@ import { useState } from "react";
 import { type Column, DataTable } from "@/components/DataTable";
 import { MonthSelector } from "@/components/MonthSelector";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AttendanceTable } from "@/features/attendance/AttendanceTable";
 import type { TeamMemberSummaryResponse } from "@/features/attendance/attendance-api";
 import { formatMinutes } from "@/features/attendance/format";
-import { useTeamAttendance } from "@/features/attendance/useAttendance";
+import { useAttendanceHistoryFor, useTeamAttendance } from "@/features/attendance/useAttendance";
 import { useAuth } from "@/features/auth/useAuth";
 
 function currentYearMonth(): { year: number; month: number } {
@@ -18,41 +19,16 @@ function toMonthString(year: number, month: number): string {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
 
-const columns: Column<TeamMemberSummaryResponse>[] = [
-  {
-    key: "employeeName",
-    header: "社員名",
-  },
-  {
-    key: "workDays",
-    header: "出勤日数",
-    render: (m) => `${m.workDays}日`,
-  },
-  {
-    key: "totalWorkMinutes",
-    header: "総勤務時間",
-    render: (m) => formatMinutes(m.totalWorkMinutes),
-  },
-  {
-    key: "totalOvertimeMinutes",
-    header: "総残業時間",
-    render: (m) => formatMinutes(m.totalOvertimeMinutes),
-  },
-  {
-    key: "absentDays",
-    header: "欠勤日数",
-    render: (m) => `${m.absentDays}日`,
-  },
-];
-
 export default function TeamPage() {
   const { user } = useAuth();
   const initial = currentYearMonth();
   const [year, setYear] = useState(initial.year);
   const [month, setMonth] = useState(initial.month);
   const monthStr = toMonthString(year, month);
+  const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null);
 
   const { data, isLoading } = useTeamAttendance(monthStr);
+  const { data: expandedHistory } = useAttendanceHistoryFor(expandedEmployee, monthStr);
 
   if (!user?.isManager) {
     return (
@@ -65,7 +41,38 @@ export default function TeamPage() {
   const handleMonthChange = (newYear: number, newMonth: number) => {
     setYear(newYear);
     setMonth(newMonth);
+    setExpandedEmployee(null);
   };
+
+  const columns: Column<TeamMemberSummaryResponse>[] = [
+    {
+      key: "employeeName",
+      header: "社員名",
+      render: (m) => (
+        <button
+          type="button"
+          onClick={() =>
+            setExpandedEmployee(expandedEmployee === m.employeeId ? null : m.employeeId)
+          }
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          {m.employeeName}
+        </button>
+      ),
+    },
+    { key: "workDays", header: "出勤日数", render: (m) => `${m.workDays}日` },
+    {
+      key: "totalWorkMinutes",
+      header: "総勤務時間",
+      render: (m) => formatMinutes(m.totalWorkMinutes),
+    },
+    {
+      key: "totalOvertimeMinutes",
+      header: "総残業時間",
+      render: (m) => formatMinutes(m.totalOvertimeMinutes),
+    },
+    { key: "absentDays", header: "欠勤日数", render: (m) => `${m.absentDays}日` },
+  ];
 
   return (
     <div className="space-y-6">
@@ -80,12 +87,22 @@ export default function TeamPage() {
           ))}
         </div>
       ) : (
-        <DataTable<TeamMemberSummaryResponse & Record<string, unknown>>
-          columns={columns as Column<TeamMemberSummaryResponse & Record<string, unknown>>[]}
-          data={(data ?? []) as (TeamMemberSummaryResponse & Record<string, unknown>)[]}
-          rowKey={(item) => item.employeeId}
-          emptyMessage="チームメンバーのデータがありません"
-        />
+        <>
+          <DataTable<TeamMemberSummaryResponse & Record<string, unknown>>
+            columns={columns as Column<TeamMemberSummaryResponse & Record<string, unknown>>[]}
+            data={(data ?? []) as (TeamMemberSummaryResponse & Record<string, unknown>)[]}
+            rowKey={(item) => item.employeeId}
+            emptyMessage="チームメンバーのデータがありません"
+          />
+          {expandedEmployee && expandedHistory && (
+            <div className="rounded-lg border p-4">
+              <h3 className="text-sm font-medium mb-3">
+                {data?.find((m) => m.employeeId === expandedEmployee)?.employeeName} の勤怠詳細
+              </h3>
+              <AttendanceTable days={expandedHistory.days} isOwner={false} />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
